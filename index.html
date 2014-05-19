@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script type="text/javascript" src="./main.js"></script>
+		<title>prn</title>
+	</head>
+	<body>
+		<canvas id="canvas" width="600" height="600" style="background-image: url('background.png'); float: left;"></canvas>
+		<div style="float: left; margin-left: 30px;">
+			<div><p>Score:</p><p id="score">0</p></div>
+			<div><p>Lives:</p><p id="lives">0</p></div>
+			<p id="log"></p>
+			<p onclick="game.levelUp();" style="background-color: #88b; padding: 5px; color: white;">Level Up</p>
+			<p id="timecard"></p>
+		</div>
+	</body>
+</html>
