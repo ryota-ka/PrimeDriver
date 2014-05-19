@@ -308,7 +308,7 @@ window.onload = function() {
         var color, originX, originY, originX_, originY_, expand;
         var cx1, cx2, cx3, cy1, cy2, cy3, cx1_, cx2_, cx3_, cy1_, cy2_, cy3_;
         var newDirection;
-        var lu = game.levelUpFrame > 20 ? 20 : game.levelUpFrame;
+        var lu = game.levelUpFrame;
         if (!isAssigned) {
           color = game.util.colors[pIndex];
           switch (direction) {
@@ -329,7 +329,7 @@ window.onload = function() {
             originY = -game.config.speed * frame + 600;
             break;
           }
-          if (isWithCursor) {
+          if (isWithCursor && lu === null) {
             if ((direction === game.direction) || game.direction === null) {
               newDirection = (direction + 2) % 4;
             } else {
@@ -465,12 +465,16 @@ window.onload = function() {
         } else {
           expand = 0;
         }
-        this.ctx.beginPath();
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(originX - expand + lu, originY - expand + lu, 40 + 2 * expand - 2 * lu, 40 + 2 * expand - 2 * lu);
-        this.ctx.fillStyle = '#fff';
-        this.ctx.font = "28px 'Menlo'";
-        this.ctx.fillText(number, originX + 20, originY + 20);
+        if (40 - lu > 0) {
+          this.ctx.beginPath();
+          this.ctx.fillStyle = color;
+          this.ctx.fillRect(originX - expand + lu / 2, originY - expand + lu / 2, 40 + 2 * expand - lu, 40 + 2 * expand - lu);
+          this.ctx.fillStyle = '#fff';
+        }
+        if (42 - lu > 0) {
+          this.ctx.font = '' + (28 - lu / 1.5) + "px 'Menlo'";
+          this.ctx.fillText(number, originX + 20, originY + 20);
+        }
       };
 
       this.drawDivisors = function() {
