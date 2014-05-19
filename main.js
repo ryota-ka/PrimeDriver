@@ -3,6 +3,8 @@ var timecard = [];
 
 window.onload = function() {
   game = new function() {
+    this.mode;
+    this.modeNumber = 0;
     this.looper;
     this.frame = -1;
     this.isPlaying = false;
@@ -11,7 +13,7 @@ window.onload = function() {
     this.failureFrame = null;
     this.dividends = [];
     this.divisors = [];
-    this.lives = 3;
+    this.lives;
     this.level;
     this.initialLevel = 0;
     this.score = 0;
@@ -38,22 +40,36 @@ window.onload = function() {
     this.start = function() {
       this.util.doms.canvas.removeEventListener('click', starter);
       //this.canvas.ctx.setTransform(1, 0.2, 0.3, 1, 0, 0);
+      switch (this.modeNumber) {
+      case -1:
+        this.mode = tutorial;
+        break;
+      case 0:
+        this.mode = normalMode;
+        break;
+      case 1:
+        this.mode = survivalMode;
+        break;
+      }
       this.frame = -1;
       this.isPaused = false;
       this.dividends = [];
       this.divisors = [];
       this.latestDirection = null;
-      this.lives = 3;
       this.score = 0;
       this.combo = 0;
 
+      this.lives = this.mode.lives;
+
       this.level = (this.initialLevel === 0 ? 1 : this.initialLevel);
-      this.config.speed = this.util.speedList[this.level];
-      this.config.freq = this.util.freqList[this.level];
+
+      this.config.speed = this.mode.speedList[this.level];
+      this.config.freq = this.mode.freqList[this.level];
       this.config.meter = 4;
       this.config.beatFreq = this.config.freq / this.config.meter;
       this.util.calculateReqFrame();
       this.initDividends();
+
       if (this.looper) {
         clearInterval(this.looper);
       }
@@ -89,16 +105,7 @@ window.onload = function() {
       if (this.levelUpFrame !== null) {
         this.canvas.drawLevelUp(++this.levelUpFrame);
         if (this.levelUpFrame === 150) {
-          this.dividends = [];
-          this.initDividends();
-          this.divisors = [];
-          this.latestDirection = null;
-          this.config.speed = this.util.speedList[this.level];
-          this.config.freq = this.util.freqList[this.level];
-          this.config.meter = 4;
-          this.config.beatFreq = this.config.freq / this.config.meter;
-          this.util.calculateReqFrame();
-          this.levelUpFrame = null;
+          this.processLevelUp();
         }
       } else if (this.failureFrame !== null) {
         if (this.failureFrame === 0) {
@@ -108,15 +115,7 @@ window.onload = function() {
         }
         this.failureFrame++;
         if (this.failureFrame === 200) {
-          this.failureFrame = null;
-          if (this.lives === 0) {
-            this.gameover();
-          } else {
-            this.dividends = [];
-            this.divisors = [];
-            this.latestDirection = null;
-            this.initDividends();
-          }
+          this.processFailure();
         }
       } else {
       if (this.frame % game.config.freq === 0) {
@@ -264,10 +263,35 @@ window.onload = function() {
       document.getElementById('timecard').appendChild(document.createTextNode((this.level - 1) + ' : ' + this.frame + ' / '));
     }
 
+    this.processLevelUp = function() {
+      this.dividends = [];
+      this.initDividends();
+      this.divisors = [];
+      this.latestDirection = null;
+      this.config.speed = this.mode.speedList[this.level];
+      this.config.freq = this.mode.freqList[this.level];
+      this.config.meter = this.mode.meterList[this.level];
+      this.config.beatFreq = this.config.freq / this.config.meter;
+      this.util.calculateReqFrame();
+      this.levelUpFrame = null;
+    }
+
     this.failure = function() {
       this.lives--;
       this.combo = 0;
       this.failureFrame = 0;
+    }
+
+    this.processFailure = function(){
+      this.failureFrame = null;
+      if (this.lives === 0) {
+        this.gameover();
+      } else {
+        this.dividends = [];
+        this.divisors = [];
+        this.latestDirection = null;
+        this.initDividends();
+      }
     }
 
     this.canvas = new function() {
@@ -572,10 +596,10 @@ window.onload = function() {
       this.reqFrame = {judgement: null, straight: null, leftCurve: null, rightCurve: null, vanishment: null};
 
       this.calculateReqFrame = function() {
-        this.reqFrame.judgement = Math.floor(228 / game.util.speedList[game.level]);
-        this.reqFrame.straight = Math.floor(248 / game.util.speedList[game.level]);
-        this.reqFrame.leftCurve = Math.floor(this.reqFrame.straight + (17.5 * Math.PI) / game.util.speedList[game.level]);
-        this.reqFrame.rightCurve = Math.floor(this.reqFrame.straight + (55 * Math.PI) / game.util.speedList[game.level]);
+        this.reqFrame.judgement = Math.floor(228 / game.mode.speedList[game.level]);
+        this.reqFrame.straight = Math.floor(248 / game.mode.speedList[game.level]);
+        this.reqFrame.leftCurve = Math.floor(this.reqFrame.straight + (17.5 * Math.PI) / game.mode.speedList[game.level]);
+        this.reqFrame.rightCurve = Math.floor(this.reqFrame.straight + (55 * Math.PI) / game.mode.speedList[game.level]);
       }
 
       this.isNatural = function(number) {
