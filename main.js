@@ -15,6 +15,7 @@ window.onload = function() {
     this.level;
     this.initialLevel = 0;
     this.score = 0;
+    this.combo = 0;
     this.direction = null;
     this.latestDirection = null;
     this.reservedDirection = null;
@@ -44,6 +45,7 @@ window.onload = function() {
       this.latestDirection = null;
       this.lives = 3;
       this.score = 0;
+      this.combo = 0;
 
       this.level = (this.initialLevel === 0 ? 1 : this.initialLevel);
       this.config.speed = this.util.speedList[this.level];
@@ -133,6 +135,8 @@ window.onload = function() {
           dividend = this.dividends[this.divisors[key].newDirection];
           if (dividend.divideBy(divisor.number)) {
             divisor.isAssigned = true;
+            this.combo++;
+            game.util.log(this.combo + ' combo');
             if (dividend.number === 1) {
               this.addScore(dividend.originalNumber);
               this.generateDividend(divisor.newDirection);
@@ -182,6 +186,7 @@ window.onload = function() {
       for (var i = 0; i < 4; i++) {
         this.generateDividend(i);
       }
+      this.frame = -1;
     }
 
     this.generateDivisor = function() {
@@ -238,7 +243,15 @@ window.onload = function() {
     };
 
     this.addScore = function(score) {
-      this.score += score;
+      if (this.combo >= 100) {
+        this.score += Math.floor(score * 1.3);
+      } else if (this.combo >= 50) {
+        this.score += Math.floor(score * 1.2);
+      } else if (this.combo >= 20) {
+        this.score += Math.round(score * 1.1);
+      } else {
+        this.score += score;
+      }
     }
 
     this.levelUp = function() {
@@ -253,6 +266,7 @@ window.onload = function() {
 
     this.failure = function() {
       this.lives--;
+      this.combo = 0;
       this.failureFrame = 0;
     }
 
@@ -517,7 +531,7 @@ window.onload = function() {
 
       this.drawPause = function() {
         this.ctx.fillStyle = '#fff';
-        this.ctx.font = "20px 'Menlo'";
+        this.ctx.font = "26px 'Menlo'";
         this.ctx.fillText('paused', 300, 300);
       }
     };
@@ -526,7 +540,7 @@ window.onload = function() {
 
     this.util = new function() {
       this.primes = [2, 3, 5, 7, 11, 13, 17, 19];
-      this.reqScoreList = [0, 300, 1000, 4000, 5500, 9000, 13000];
+      this.reqScoreList = [0, 300, 1000, 2500, 5500, 9000, 13000];
 
       this.dividendsList = [[],
         [8, 12, 18, 20, 27, 30, 45, 50, 75, 125],
@@ -551,7 +565,7 @@ window.onload = function() {
       ];
 
       this.pIndexList = [[], [0, 1, 2], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3], [1, 2, 3, 4], [1, 2, 3, 4], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5]];
-      this.speedList = [0, 1, 1.3, 1.3, 1.5, 1.3, 1.5, 2, 2, 2, 2];
+      this.speedList = [0, 1, 1.3, 1.3, 1.5, 1.3, 1.5, 1.7, 2, 2, 2];
       this.freqList = [0, 140, 120, 130, 120, 140, 140, 80, 80, 80, 80];
 
       this.colors = ['#b88', '#bb8', '#b8b', '#88b', '#8b8', '#8bb'];
