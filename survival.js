@@ -1,10 +1,12 @@
 survivalMode = {
   lives: 1,
+  maxLevel: 4,
 
   reqScoreList: [0, 100, 200, 300, 400],
 
   speedList: [0, 1, 1.2, 1.2, 1.3],
   freqList: [0, 200, 180, 180, 160],
+  meterList: [0, 4, 4, 4, 4],
 
   pIndexList: [[0, 1, 2], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3]],
   dividendsList: [[],
